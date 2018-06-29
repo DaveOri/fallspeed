@@ -28,17 +28,25 @@ xz=(0,2)
 cols=['shapefile','Jdmax','Ddmax','Dprojcirc','projarea','mass','vDJ','vDD','vDproj']
 
 path = '/data/optimice/scattering_databases/shape_files_jussi/' # './'
-folders=['simultaneous-0.0/','simultaneous-0.1/','simultaneous-0.2/','simultaneous-0.5/','simultaneous-1.0/','simultaneous-2.0/','subsequent-0.1/','subsequent-0.2/','subsequent-0.5/','subsequent-1.0/','subsequent-2.0/','rimeonly_120e-6']
-
+folders=['simultaneous-0.0','simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0','simultaneous-2.0','subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0','subsequent-2.0','rimeonly_120e-6']
+folders=['needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6']
 for folder in folders:
-    shpfiles = glob(path+folder+'*.agg')
+    shpfiles = glob(path+folder+'/*.agg')
     data = pd.DataFrame(columns=cols)
     jj = 0
     for shapefile in shpfiles:
         shape=np.loadtxt(shapefile)
         metadata=shapefile+'.gz.meta'
-        attributes=eval(open(metadata).read())
-        d=attributes['grid_res']
+        
+        try:
+          attributes=eval(open(metadata).read())
+          d=attributes['grid_res']
+          dmax_att=attributes['max_diam']
+          meta = True
+        except:
+          d=4e-5
+          meta=False
+          
         try:
             hull3d=ConvexHull(shape)
             hull3d=hull3d.points[hull3d.vertices]
@@ -54,6 +62,8 @@ for folder in folders:
                 if dist > dmax:
                     dmax = dist
         dmax = d*dmax**0.5
+        if not meta:
+          dmax_att = dmax
 
         try:
             projection=pd.DataFrame(shape[:,xy]).drop_duplicates().values
@@ -71,13 +81,12 @@ for folder in folders:
 
         area=projection.shape[0]*d**2.0
         diam=d*circle[2]*2.0
-        dmax_att=attributes['max_diam']
         area_ratio=projection.shape[0]*d**2.0/(np.pi*(d*circle[2])**2.0)
         mass=shape.shape[0]*d**3.0*916.0
 
         from heymsfield_2010 import dia2vel
         v=dia2vel(diam, 1.0, 1.6e-5, mass, area)
-        print(folder[-4:],jj,len(shpfiles),v,dia2vel(dmax, 1.0, 1.6e-5, mass, area),dia2vel(attributes['max_diam'], 1.0, 1.6e-5, mass, area))
-        data.loc[jj]=[shapefile,dmax_att,dmax,diam,area,mass,v,dia2vel(dmax, 1.0, 1.6e-5, mass, area),dia2vel(attributes['max_diam'], 1.0, 1.6e-5, mass, area)]
+        print(folder[-6:],jj,len(shpfiles),v,dia2vel(dmax, 1.0, 1.6e-5, mass, area),dia2vel(dmax_att, 1.0, 1.6e-5, mass, area))
+        data.loc[jj]=[shapefile,dmax_att,dmax,diam,area,mass,v,dia2vel(dmax, 1.0, 1.6e-5, mass, area),dia2vel(dmax_att, 1.0, 1.6e-5, mass, area)]
         jj = jj + 1
-    data.to_csv(folder[2:-1]+'.csv')
+    data.to_csv(folder+'.csv')

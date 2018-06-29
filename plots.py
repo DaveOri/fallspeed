@@ -24,7 +24,7 @@ for csvfile in sorted(datafiles):
     data = pd.read_csv(csvfile)
     if badcol in data.columns:
         data.drop(badcol,axis=1,inplace=True)
-    data.sort_values(by='Jdmax',inplace=True)
+    data.sort('Jdmax',inplace=True)
 
     def powerLaw(x,a,b):
         return a*x**b
@@ -115,8 +115,43 @@ plt.figure(figsize=(8,6))
 for i,j in zip(pvD,names):
     if 'multaneous' in j:
         plt.plot(xdata,powerLaw(xdata*1e-3,*i),label=j[-3:])
+        print(j)
+    elif 'only' in j:
+        plt.plot(xdata,powerLaw(xdata*1e-3,*i),'.',label='rime C')
+        print(j)
+    elif 'needle' in j:
+        #plt.plot(xdata,powerLaw(xdata*1e-3,*i),'--',label=j[0:11])
+        print(j)
     else:
         plt.plot(xdata,powerLaw(xdata*1e-3,*i),'h-',label=j[-3:])
+        print(j)
+plt.ylim([0,8])
+plt.ylabel('terminal fall velocity   [m/s]')
+plt.xlabel('Maximum Dimension     [mm]')
 plt.legend()
+plt.grid()
 plt.title('simultaneous-lines         subsequent-markers')
 plt.savefig('all_fitted_vD.png')
+
+xdata = np.linspace(0,35,60)
+plt.figure(figsize=(8,6))
+for i,j in zip(pvD,names):
+    if 'multaneous' in j:
+        #plt.plot(xdata,powerLaw(xdata*1e-3,*i),label=j[-3:])
+        print(j)
+    elif 'only' in j:
+        #plt.plot(xdata,powerLaw(xdata*1e-3,*i),'.',label='rime C')
+        print(j)
+    elif 'needle' in j:
+        plt.plot(xdata,powerLaw(xdata*1e-3,*i),'--',label=j[0:11])
+        print(j)
+    else:
+        #plt.plot(xdata,powerLaw(xdata*1e-3,*i),'h-',label=j[-3:])
+        print(j)
+plt.ylim([0,3])
+plt.legend()
+plt.grid()
+plt.ylabel('terminal fall velocity   [m/s]')
+plt.xlabel('Maximum Dimension     [mm]')
+plt.title('unrimed needle aggregates')
+plt.savefig('all_neeldes_vD.png')

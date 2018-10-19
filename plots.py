@@ -11,7 +11,9 @@ from scipy.optimize import curve_fit
 from glob import glob
 import matplotlib.pyplot as plt
 
-datafiles = glob('./*.csv')
+extension = '_KC.png'
+
+datafiles = glob('./*KC.csv')
 badcol='Unnamed: 0'
 
 pprojD = []
@@ -107,7 +109,7 @@ for csvfile in sorted(datafiles):
     ax[1,2].set_ylim(xylim)
     fig.suptitle('s'+csvfile[2:-4],fontweight='heavy')
     fig.tight_layout()
-    fig.savefig('s'+csvfile[2:-4]+'.png')
+    fig.savefig('s'+csvfile[2:-4]+extension)
     names.append(csvfile[2:-4])
 #%%
 xdata = np.linspace(0,35,60)
@@ -131,7 +133,7 @@ plt.xlabel('Maximum Dimension     [mm]')
 plt.legend()
 plt.grid()
 plt.title('simultaneous-lines         subsequent-markers')
-plt.savefig('all_fitted_vD.png')
+plt.savefig('all_fitted_vD'+extension)
 
 xdata = np.linspace(0,35,60)
 plt.figure(figsize=(8,6))
@@ -154,4 +156,4 @@ plt.grid()
 plt.ylabel('terminal fall velocity   [m/s]')
 plt.xlabel('Maximum Dimension     [mm]')
 plt.title('unrimed needle aggregates')
-plt.savefig('all_neeldes_vD.png')
+plt.savefig('all_neeldes_vD'+extension)

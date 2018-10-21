@@ -26,7 +26,7 @@ for csvfile in sorted(datafiles):
     data = pd.read_csv(csvfile)
     if badcol in data.columns:
         data.drop(badcol,axis=1,inplace=True)
-    data.sort('Jdmax',inplace=True)
+    data.sort_values(by='Jdmax',inplace=True)
 
     def powerLaw(x,a,b):
         return a*x**b

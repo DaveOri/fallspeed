@@ -21,6 +21,7 @@ def dia2vel(diam, rho_air, nu_air, mass, area, smooth=False ):
     Cd  = X2Cd_kc05smooth(Xbest)
   else:
     Cd  = X2Cd_kc05rough(Xbest)
+  print(Xbest, Cd)
   return np.sqrt( 2*np.abs(mass*grav - Fb)/(rho_air * area * Cd))
 
 def X2Cd_kc05rough(Xbest):
@@ -35,10 +36,10 @@ def X2Cd_kc05rough(Xbest):
   # Re-X eq. (2.5)
   bracket = np.sqrt(1.0 + c1 * np.sqrt(Xbest)) - 1.0
   # turbulent Reynold's number, eq (3.3)
-  psi = (1+(Xbest*X0_i)**2) / (1+Ct*(Xbest*X0_i)**2)
+  psi = (1.0+(Xbest*X0_i)**2) / (1.0+Ct*(Xbest*X0_i)**2)
   Re  = c2*bracket**2 # * np.sqrt(psi) # TODO remove psi in Re?
   # eq. (2.1) from KC05 with (3.2)
-  return co_i * (1. + do_i * np.sqrt(Re))**2 / psi
+  return co_i * (1.0 + do_i / np.sqrt(Re))**2 / psi
 
 
 def X2Cd_kc05smooth(Xbest):
@@ -350,6 +351,8 @@ def fall_velocity_KC(area, mass, D_max, T, P):
     eta = air_dynamic_viscosity(T)
     rho_air = air_density(T, P)
 
+    g = 9.807
+
     X = 2.0 * rho_air * mass * g * D_max**2 / (area * eta**2) # 2.4b
     X_sqrt = np.sqrt(X)
 
@@ -366,7 +369,7 @@ def fall_velocity_KC(area, mass, D_max, T, P):
     psi = (1.0 + X_rel)/(1.0 + Ct*X_rel)
     # 3.1
     Cd /= psi
-
+    print(X_rel, Cd)
     # 2.1
     return np.sqrt(2*mass*g / (rho_air*area*Cd)) 
     

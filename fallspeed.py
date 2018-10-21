@@ -93,3 +93,6 @@ for folder in folders:
         data.loc[jj]=[shapefile,dmax_att,dmax,diam,area,mass,v,dia2vel(dmax, 1.0, 1.6e-5, mass, area),dia2vel(dmax_att, 1.0, 1.6e-5, mass, area)]
         jj = jj + 1
     data.to_csv(folder+'KC'+'.csv')
+
+
+

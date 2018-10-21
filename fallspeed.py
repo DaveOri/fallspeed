@@ -27,19 +27,21 @@ yz=(1,2)
 xz=(0,2)
 cols=['shapefile','Jdmax','Ddmax','Dprojcirc','projarea','mass','vDJ','vDD','vDproj']
 
-path = '/data/optimice/scattering_databases/shape_files_jussi/' # './'
+#path = '/data/optimice/scattering_databases/shape_files_jussi/' # './'
+path = '/work/shape_files_jussi/'
 folders=['simultaneous-0.0','simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0','simultaneous-2.0','subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0','subsequent-2.0','rimeonly_120e-6']
 folders=['needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6']
-folders=['simultaneous-0.0','simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0','simultaneous-2.0','subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0','subsequent-2.0','rimeonly_120e-6','needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6']
+folders=['simultaneous-0.0','simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0','simultaneous-2.0'] #,'subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0','subsequent-2.0','rimeonly_120e-6','needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6']
 for folder in folders:
     print(folder)
+    if ('needle' in folder):
+        folder = 'DDA_targets/' + folder
     shpfiles = glob(path+folder+'/*.agg')
     data = pd.DataFrame(columns=cols)
     jj = 0
     for shapefile in shpfiles:
         shape=np.loadtxt(shapefile)
         metadata=shapefile+'.gz.meta'
-        
         try:
           attributes=eval(open(metadata).read())
           d=attributes['grid_res']
@@ -48,7 +50,6 @@ for folder in folders:
         except:
           d=4e-5
           meta=False
-          
         try:
             hull3d=ConvexHull(shape)
             hull3d=hull3d.points[hull3d.vertices]

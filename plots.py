@@ -11,9 +11,11 @@ from scipy.optimize import curve_fit
 from glob import glob
 import matplotlib.pyplot as plt
 
-extension = '_KC.png'
+model = 'HW'
+model = 'KC'
+extension = '_'+model+'.png'
 
-datafiles = glob('./*KC.csv')
+datafiles = glob('./*'+model+'.csv')
 badcol='Unnamed: 0'
 
 pprojD = []
@@ -22,18 +24,29 @@ pmassD = []
 pvD = []
 names = []
 
+
+def powerLaw(x,a,b):
+    return a*x**b
+
+def linearLaw(x,a,b):
+    return a+b*x
+
+def fitPower(X,Y):
+    popt, pcov = curve_fit(powerLaw, X, Y)
+    return popt, pcov
+
+def fitLinearLog(X,Y):
+    popt, pcov = curve_fit(linearLaw, np.log10(X), np.log10(Y))
+    popt[0] = 10.0**popt[0]
+    return popt, pcov
+
 for csvfile in sorted(datafiles):
     data = pd.read_csv(csvfile)
     if badcol in data.columns:
         data.drop(badcol,axis=1,inplace=True)
     data.sort_values(by='Jdmax',inplace=True)
 
-    def powerLaw(x,a,b):
-        return a*x**b
-    
-    def linearLaw(x,a,b):
-        return a+b*x
-    
+   
     fig, ax = plt.subplots(2,3,figsize=(10,7))
     #ax[0,0].scatter(1e3*data['Jdmax'],1e3*data['Ddmax'])
     ax[0,0].scatter(1e3*data['Jdmax'],1e3*data['Dprojcirc'],linewidth=0.2)
@@ -78,7 +91,8 @@ for csvfile in sorted(datafiles):
     ax[1,0].set_xlim(xlim)
     ax[1,0].set_ylim(ylim)
     xdata = np.linspace(xlim[0],xlim[1],100)
-    popt, pcov = curve_fit(powerLaw, data['Jdmax'], data['mass'])
+#    popt, pcov = curve_fit(powerLaw, data['Jdmax'], data['mass'])
+    popt, pcov = fitLinearLog(data['Jdmax'], data['mass'])
     ax[1,0].plot(xdata,1e6*powerLaw(xdata*1e-3,*popt),c='g',linewidth=2,label='%1.1gx$^{%1.1f}$' % tuple(popt))
     pmassD.append(popt)    
     ax[1,0].legend(loc=4)
@@ -93,7 +107,8 @@ for csvfile in sorted(datafiles):
     ax[1,1].set_xlim(xlim)
     ax[1,1].set_ylim(ylim)
     xdata = np.linspace(xlim[0],xlim[1],100)
-    popt, pcov = curve_fit(powerLaw, data['Jdmax'], data['vDproj'])
+#    popt, pcov = curve_fit(powerLaw, data['Jdmax'], data['vDproj'])
+    popt, pcov = fitLinearLog(data['Jdmax'], data['vDproj'])
     ax[1,1].plot(xdata,powerLaw(xdata*1e-3,*popt),c='g',linewidth=2,label='%1.3fx$^{%1.1f}$' % tuple(popt))
     pvD.append(popt)    
     ax[1,1].legend(loc=4)
@@ -107,32 +122,32 @@ for csvfile in sorted(datafiles):
     ax[1,2].plot(xylim, xylim, ls="-", c='r')
     ax[1,2].set_xlim(xylim)
     ax[1,2].set_ylim(xylim)
-    fig.suptitle('s'+csvfile[2:-4],fontweight='heavy')
+    fig.suptitle(csvfile[2:-4],fontweight='heavy')
     fig.tight_layout()
-    fig.savefig('s'+csvfile[2:-4]+extension)
-    names.append(csvfile[2:-4])
+    fig.savefig(csvfile[2:-4]+extension)
+    names.append(csvfile[:-4])
 #%%
-xdata = np.linspace(0,35,60)
+xdata = np.logspace(np.log10(0.001),np.log10(35),120)
 plt.figure(figsize=(8,6))
 for i,j in zip(pvD,names):
     if 'multaneous' in j:
-        plt.plot(xdata,powerLaw(xdata*1e-3,*i),label=j[-3:])
+        plt.plot(xdata,powerLaw(xdata*1e-3,*i),label=j[-5:-2])
         print(j)
     elif 'only' in j:
         plt.plot(xdata,powerLaw(xdata*1e-3,*i),'.',label='rime C')
         print(j)
     elif 'needle' in j:
-        #plt.plot(xdata,powerLaw(xdata*1e-3,*i),'--',label=j[0:11])
+        plt.plot(xdata,powerLaw(xdata*1e-3,*i),'--',label=j[0:11])
         print(j)
     else:
-        plt.plot(xdata,powerLaw(xdata*1e-3,*i),'h-',label=j[-3:])
+        plt.plot(xdata,powerLaw(xdata*1e-3,*i),'.-',label=j[-5:-2])
         print(j)
 plt.ylim([0,8])
 plt.ylabel('terminal fall velocity   [m/s]')
 plt.xlabel('Maximum Dimension     [mm]')
-plt.legend()
+plt.legend(ncol=3)
 plt.grid()
-plt.title('simultaneous-lines         subsequent-markers')
+plt.title('simultaneous-lines         subsequent-markers '+model)
 plt.savefig('all_fitted_vD'+extension)
 
 xdata = np.linspace(0,35,60)
@@ -145,7 +160,7 @@ for i,j in zip(pvD,names):
         #plt.plot(xdata,powerLaw(xdata*1e-3,*i),'.',label='rime C')
         print(j)
     elif 'needle' in j:
-        plt.plot(xdata,powerLaw(xdata*1e-3,*i),'--',label=j[0:11])
+        plt.plot(xdata,powerLaw(xdata*1e-3,*i),'--',label=j[2:16])
         print(j)
     else:
         #plt.plot(xdata,powerLaw(xdata*1e-3,*i),'h-',label=j[-3:])
@@ -155,5 +170,5 @@ plt.legend()
 plt.grid()
 plt.ylabel('terminal fall velocity   [m/s]')
 plt.xlabel('Maximum Dimension     [mm]')
-plt.title('unrimed needle aggregates')
-plt.savefig('all_neeldes_vD'+extension)
+plt.title('unrimed needle aggregates '+model)
+plt.savefig('all_needles_vD'+extension)

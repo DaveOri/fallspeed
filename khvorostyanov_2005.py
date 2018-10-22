@@ -21,7 +21,6 @@ def dia2vel(diam, rho_air, nu_air, mass, area, smooth=False ):
     Cd  = X2Cd_kc05smooth(Xbest)
   else:
     Cd  = X2Cd_kc05rough(Xbest)
-  print(Xbest, Cd)
   return np.sqrt( 2*np.abs(mass*grav - Fb)/(rho_air * area * Cd))
 
 def X2Cd_kc05rough(Xbest):

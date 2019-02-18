@@ -7,7 +7,7 @@ Created on Fri May 18 15:02:37 2018
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 from small_circle import make_circle
 from glob import glob

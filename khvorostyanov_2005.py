@@ -9,7 +9,7 @@ import numpy as np
 
 def dia2vel(diam, rho_air, nu_air, mass, area, smooth=False ):
   #mtot = sp%m_r + sp%m_i + sp%m_w 
-  grav = 9.807
+  grav = 9.81
   rho_ice = 917.0
 
   # Best number eq. (2.4b) with buoyancy

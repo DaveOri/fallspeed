@@ -46,7 +46,7 @@ def dia2vel(diaSpec_SI, rho_air_SI, nu_SI, mass, area, k=0.5):
 #     k = 0.5   #defined in the paper
     delta_0 = 8.0
     C_0 = 0.35
-    g = 9.807
+    g = 9.81
     
     area_proj = area/((np.pi/4.)*diaSpec_SI**2)
     eta = nu_SI * rho_air_SI #!now dynamic viscosity

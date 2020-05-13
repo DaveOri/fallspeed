@@ -23,7 +23,9 @@ from glob import glob
 #metadata='./rimeonly_120e-6/dendrite-650e-6-1-0.1-rimeonly_120e-6-YWrwsxzK.agg.gz.meta'
 
 model = 'HW'
-#model = 'KC'
+model = 'KC'
+#model = 'B89'
+model = 'B92'
 
 xy=(0,1)
 yz=(1,2)
@@ -32,11 +34,12 @@ cols=['shapefile','Jdmax','Ddmax','Dprojcirc','projarea','mass','vDJ','vDD','vDp
 
 #path = '/data/optimice/scattering_databases/shape_files_jussi/' # './'
 path = '/work/shape_files_jussi/'
-folders=['simultaneous-0.0','simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0','simultaneous-2.0','subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0','subsequent-2.0','rimeonly_120e-6','needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6']
-#folders=['needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6','simultaneous-0.0','rimeonly_120e-6']
-#folders=['simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0','simultaneous-2.0']
-#folders=['subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0',
-folders = ['subsequent-2.0']
+#folders=['simultaneous-0.0','simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0','simultaneous-2.0','subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0','subsequent-2.0','rimeonly_120e-6','needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6']
+folders=['needle-200e-6','needle-350e-6','needle-650e-6','needle-1100e-6','needle-2000e-6','simultaneous-0.0','rimeonly_120e-6']
+#folders=['simultaneous-0.1','simultaneous-0.2','simultaneous-0.5','simultaneous-1.0']
+#folders=['subsequent-0.1','subsequent-0.2','subsequent-0.5','subsequent-1.0']
+#folders=['simultaneous-2.0',
+folders=['subsequent-2.0']
 for folder in folders:
     print(folder)
     #if ('needle' in folder):
@@ -89,9 +92,15 @@ for folder in folders:
         	from heymsfield_2010 import dia2vel
         elif model == 'KC':
         	from khvorostyanov_2005 import dia2vel
-        v=dia2vel(diam, 1.0, 1.6e-5, mass, area)
-        print(folder[-6:],jj,len(shpfiles),v,dia2vel(dmax, 1.0, 1.6e-5, mass, area),dia2vel(dmax_att, 1.0, 1.6e-5, mass, area))
-        data.loc[jj]=[shapefile,dmax_att,dmax,diam,area,mass,v,dia2vel(dmax, 1.0, 1.6e-5, mass, area),dia2vel(dmax_att, 1.0, 1.6e-5, mass, area)]
+        elif model == 'B89':
+            from boehm_1989 import dia2vel
+        elif model == 'B92':
+            from boehm_1992 import dia2vel
+        rho_air = 1.287
+        nu_air = 1.717696e-5/rho_air
+        v=dia2vel(diam, rho_air, nu_air, mass, area)
+        print(folder[-6:],jj,len(shpfiles),v,dia2vel(dmax, rho_air, nu_air, mass, area),dia2vel(dmax_att, rho_air, nu_air, mass, area))
+        data.loc[jj]=[shapefile,dmax_att,dmax,diam,area,mass,v,dia2vel(dmax, rho_air, nu_air, mass, area),dia2vel(dmax_att, rho_air, nu_air, mass, area)]
         jj = jj + 1
     data.to_csv(folder+model+'.csv')
 

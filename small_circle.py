@@ -125,10 +125,10 @@ def make_diameter(p0, p1):
 	return (cx, cy, max(r0, r1))
 
 
-_MULTIPLICATIVE_EPSILON = 1 + 1e-14
+_TOLERANCE = 1 + 1e-14
 
 def is_in_circle(c, p):
-	return c is not None and math.hypot(p[0] - c[0], p[1] - c[1]) <= c[2] * _MULTIPLICATIVE_EPSILON
+	return c is not None and math.hypot(p[0] - c[0], p[1] - c[1]) <= c[2] * _TOLERANCE
 
 
 # Returns twice the signed area of the triangle defined by (x0, y0), (x1, y1), (x2, y2).
